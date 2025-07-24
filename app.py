@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, url_for
+import pymysql
+pymysql.install_as_MySQLdb()
 import MySQLdb
 from config import *
 
@@ -158,6 +160,7 @@ def delete_order(id):
     cursor.execute("DELETE FROM orders WHERE id=%s", (id,))
     db.commit()
     return redirect('/orders')
+
 
 # ===================== Supplier CRUD =====================
 @app.route('/suppliers')
