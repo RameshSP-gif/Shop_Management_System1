@@ -7,7 +7,13 @@ from config import *
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-db = MySQLdb.connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME)
+# ✅ Fixed MySQLdb connection using keyword arguments
+db = MySQLdb.connect(
+    host=DB_HOST,
+    user=DB_USER,
+    passwd=DB_PASSWORD,
+    db=DB_NAME
+)
 cursor = db.cursor()
 
 @app.route('/')
