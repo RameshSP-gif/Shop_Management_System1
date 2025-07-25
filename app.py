@@ -12,7 +12,8 @@ db = MySQLdb.connect(
     host=DB_HOST,
     user=DB_USER,
     passwd=DB_PASSWORD,
-    db=DB_NAME
+    db=DB_NAME,
+    port=DB_PORT
 )
 cursor = db.cursor()
 
