@@ -7,12 +7,13 @@ from config import *
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-# ✅ Fixed MySQLdb connection using keyword arguments
+# Connect to the database
 db = MySQLdb.connect(
     host=DB_HOST,
     user=DB_USER,
     passwd=DB_PASSWORD,
     db=DB_NAME,
+    charset='utf8mb4',
     port=DB_PORT
 )
 cursor = db.cursor()
@@ -29,7 +30,7 @@ def login():
         cursor.execute("SELECT * FROM users WHERE email=%s AND password=%s", (email, password))
         user = cursor.fetchone()
         if user:
-            session['user'] = user[1]
+            session['user'] = user[1]  # Assuming user[1] is the name
             return redirect('/dashboard')
         else:
             return render_template('login.html', error='Invalid credentials')
@@ -81,7 +82,6 @@ def logout():
     session.clear()
     return redirect('/login')
 
-
 # ===================== Product CRUD =====================
 @app.route('/product/add', methods=['GET', 'POST'])
 def add_product():
@@ -112,7 +112,6 @@ def delete_product(id):
     cursor.execute("DELETE FROM products WHERE id=%s", (id,))
     db.commit()
     return redirect('/products')
-
 
 # ===================== Customer CRUD =====================
 @app.route('/customer/add', methods=['GET', 'POST'])
@@ -145,7 +144,6 @@ def delete_customer(id):
     db.commit()
     return redirect('/customers')
 
-
 # ===================== Order CRUD =====================
 @app.route('/order/add', methods=['GET', 'POST'])
 def add_order():
@@ -156,9 +154,9 @@ def add_order():
         cursor.execute("INSERT INTO orders (customer_id, product_id, quantity) VALUES (%s, %s, %s)", (customer_id, product_id, quantity))
         db.commit()
         return redirect('/orders')
-    cursor.execute("SELECT id FROM customers")
+    cursor.execute("SELECT id, name FROM customers")
     customers = cursor.fetchall()
-    cursor.execute("SELECT id FROM products")
+    cursor.execute("SELECT id, name FROM products")
     products = cursor.fetchall()
     return render_template('order_form.html', customers=customers, products=products)
 
@@ -167,7 +165,6 @@ def delete_order(id):
     cursor.execute("DELETE FROM orders WHERE id=%s", (id,))
     db.commit()
     return redirect('/orders')
-
 
 # ===================== Supplier CRUD =====================
 @app.route('/suppliers')
@@ -204,7 +201,6 @@ def delete_supplier(id):
     db.commit()
     return redirect('/suppliers')
 
-
 # ===================== Inventory CRUD =====================
 @app.route('/inventory')
 def inventory():
@@ -240,7 +236,6 @@ def delete_inventory(id):
     db.commit()
     return redirect('/inventory')
 
-
 # ===================== Sales CRUD =====================
 @app.route('/sales')
 def sales():
@@ -256,7 +251,7 @@ def add_sale():
         cursor.execute("INSERT INTO sales (product_id, quantity) VALUES (%s, %s)", (product_id, quantity))
         db.commit()
         return redirect('/sales')
-    cursor.execute("SELECT id FROM products")
+    cursor.execute("SELECT id, name FROM products")
     products = cursor.fetchall()
     return render_template('sale_form.html', products=products)
 
@@ -265,7 +260,6 @@ def delete_sale(id):
     cursor.execute("DELETE FROM sales WHERE id=%s", (id,))
     db.commit()
     return redirect('/sales')
-
 
 if __name__ == '__main__':
     app.run(debug=True)
